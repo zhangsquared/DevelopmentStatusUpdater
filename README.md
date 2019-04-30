@@ -1,5 +1,5 @@
 # DevelopmentStatusUpdater
 Automatic Development Status Updater
 
-.NET CORE 2.1
-Console app to automatically generate random weekly development report. 
+<br />.NET CORE 2.1
+<br />Console app to automatically generate random weekly development report. 
