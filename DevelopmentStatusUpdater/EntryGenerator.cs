@@ -56,7 +56,8 @@ namespace DevelopmentStatusUpdater
 			return entry;
 		}
 
-		private IEntryTemplate RandomGenerateEntry(string appName)
+		#region IRandomGenerator
+		public IEntryTemplate RandomGenerateEntry(string appName)
 		{
 			double r = random.NextDouble();
 			if (r < 0.7) return new DevelopmentEntryTemplate(appName);
@@ -86,7 +87,7 @@ namespace DevelopmentStatusUpdater
 			return appNames[appNames.Length - 1];
 		}
 
-		private bool RandomGenerateComplete(EntryTemplateType type)
+		public bool RandomGenerateComplete(EntryTemplateType type)
 		{
 			double r = random.NextDouble();
 			switch (type)
@@ -102,5 +103,6 @@ namespace DevelopmentStatusUpdater
 			}
 
 		}
+		#endregion
 	}
 }

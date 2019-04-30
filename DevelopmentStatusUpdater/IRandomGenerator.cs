@@ -6,8 +6,12 @@ namespace DevelopmentStatusUpdater
 {
 	public interface IRandomGenerator
 	{
+		IEntryTemplate RandomGenerateEntry(string appName);
+
+		int RandomGenerateAppNumber(int totalAppNumber);
+
 		string RandomGenerateApplicationName(string[] appNames);
 
-		int RandomGenerateAppNumber(int totalNumber);
+		bool RandomGenerateComplete(EntryTemplateType type);
 	}
 }
