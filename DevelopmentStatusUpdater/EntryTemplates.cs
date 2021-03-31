@@ -15,7 +15,7 @@ namespace DevelopmentStatusUpdater
 
 		public string Application() => app;
 
-		public string Description() => app + " Development";
+		public string Description() => app + " feature development";
 
 		public bool? IsDevelopment() => true;
 
@@ -35,7 +35,7 @@ namespace DevelopmentStatusUpdater
 
 		public string Application() => app;
 
-		public string Description() => "Bug Fixes And Maintenance";
+		public string Description() => "bug fixes and maintenance";
 
 		public bool? IsDevelopment() => true;
 
@@ -55,7 +55,7 @@ namespace DevelopmentStatusUpdater
 
 		public string Application() => app;
 
-		public string Description() => "Client Support; Production Support";
+		public string Description() => "client support; production support";
 
 		public bool? IsDevelopment() => false;
 

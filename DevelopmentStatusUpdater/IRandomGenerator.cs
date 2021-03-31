@@ -10,7 +10,7 @@ namespace DevelopmentStatusUpdater
 
 		int RandomGenerateAppNumber(int totalAppNumber);
 
-		string RandomGenerateApplicationName(string[] appNames);
+		string RandomGenerateApplicationName(string[] appNames, IDictionary<string, double> appearanceRatio);
 
 		bool RandomGenerateComplete(EntryTemplateType type);
 	}

@@ -7,29 +7,49 @@ namespace DevelopmentStatusUpdater
 {
 	public class EntryGenerator : IEntryGenerator, IRandomGenerator
 	{
+		#region const
+		// which app
+		public const double APP_NUMBER_RATIO = 0.75;
+
+		// EntryTemplateType
+		public const double DEV_RATIO = 0.7;
+		public const double BUG_RATIO = 0.2;
+		// support ration = 1 - 0.7 - 0.2 = 0.1
+
+		// IsComplete
+		public const double DEV_COMPLETE_RATIO = 0.5;
+		public const double BUG_COMPLETE_RATIO = 0.8;
+		public const double SUPPORT_COMPLETE_RATIO = 0.95;
+		#endregion
+
 		private readonly string username;
-		private readonly string[] applicationNames;
+
+		public readonly Dictionary<string, double> ApplicationMap; // key: app name; value: appearance ratio
 
 		private static readonly Random random = new Random();
 
-		public EntryGenerator(string username, string[] appNames)
+		public EntryGenerator(string username, string[] appNames, double[] appRatios)
 		{
 			this.username = username;
-			applicationNames = appNames;
+			ApplicationMap = new Dictionary<string, double>();
+			for (int i = 0; i < appNames.Length; i++)
+			{
+				ApplicationMap[appNames[i]] = appRatios[i];
+			}
 		}
 
 		public IEntry[] NewWorkEntries(string date, double hours)
 		{
-			int appNumber = RandomGenerateAppNumber(applicationNames.Length);
+			int appNumber = RandomGenerateAppNumber(ApplicationMap.Keys.Count);
 			IEntry[] entries = new IEntry[appNumber];
 
 			List<string> usedNames = new List<string>();
 			double remaingHours = hours;
 
-			for(int i = 0; i < appNumber; i++)
+			for (int i = 0; i < appNumber; i++)
 			{
-				string[] remainingNames = applicationNames.Except(usedNames).ToArray();
-				string appName = appNumber == 1 ? applicationNames[0] : RandomGenerateApplicationName(remainingNames);
+				string[] remainingNames = ApplicationMap.Keys.Except(usedNames).ToArray();
+				string appName = RandomGenerateApplicationName(remainingNames, ApplicationMap);
 				usedNames.Add(appName);
 
 				IEntryTemplate entryTemplate = RandomGenerateEntry(appName);
@@ -40,7 +60,7 @@ namespace DevelopmentStatusUpdater
 				if (i == appNumber - 1) entries[i].Hours = remaingHours;
 				else
 				{
-					entries[i].Hours = random.Next((int)(remaingHours/2), (int)remaingHours);
+					entries[i].Hours = random.Next((int)(remaingHours / 2), (int)Math.Ceiling(remaingHours));
 					remaingHours -= entries[i].Hours;
 				}
 			}
@@ -60,29 +80,48 @@ namespace DevelopmentStatusUpdater
 		public IEntryTemplate RandomGenerateEntry(string appName)
 		{
 			double r = random.NextDouble();
-			if (r < 0.7) return new DevelopmentEntryTemplate(appName);
-			if (r < 0.9) return new BugFixEntryTemplate(appName);
+			if (r < DEV_RATIO) return new DevelopmentEntryTemplate(appName);
+			if (r < DEV_RATIO + BUG_RATIO) return new BugFixEntryTemplate(appName);
 			return new ClientSupportEntryTemplate(appName);
 		}
 
 		public int RandomGenerateAppNumber(int totalAppNumber)
 		{
-			double ratio = 0.85;
+			double d = 1 / APP_NUMBER_RATIO;
+			double sum = 0;
+			for (int i = 0; i < totalAppNumber; i++) sum += Math.Pow(d, i);
+			double[] dist = new double[totalAppNumber];
+			for (int i = 0; i < totalAppNumber; i++) dist[i] = Math.Pow(d, totalAppNumber - 1 - i) / sum;
+
 			double r = random.NextDouble();
-			for (int i = 0; i < totalAppNumber - 1; i++)
+			double accumulated = 0;
+			for (int i = 0; i < totalAppNumber; i++)
 			{
-				if (r < ratio) return i + 1;
+				if (r < accumulated + dist[i]) return i + 1;
+				else accumulated += dist[i];
 			}
 			return totalAppNumber;
 		}
 
-		public string RandomGenerateApplicationName(string[] appNames)
+		public string RandomGenerateApplicationName(string[] appNames, IDictionary<string, double> appearanceRatio)
 		{
-			double ratio = 0.85;
-			double r = random.NextDouble();
-			for(int i = 0; i < appNames.Length - 1; i++)
+			Dictionary<string, double> adjustedMap = new Dictionary<string, double>();
+			foreach (string appName in appNames)
 			{
-				if (r < ratio) return appNames[i];
+				adjustedMap[appName] = appearanceRatio[appName];
+			}
+			double sum = adjustedMap.Values.Sum();
+			foreach (string appName in appNames)
+			{
+				adjustedMap[appName] = adjustedMap[appName] / sum;
+			}
+
+			double r = random.NextDouble();
+			double accumulated = 0;
+			for (int i = 0; i < appNames.Length - 1; i++)
+			{
+				if (r < accumulated + adjustedMap[appNames[i]]) return appNames[i];
+				else accumulated += adjustedMap[appNames[i]];
 			}
 			return appNames[appNames.Length - 1];
 		}
@@ -93,15 +132,14 @@ namespace DevelopmentStatusUpdater
 			switch (type)
 			{
 				case EntryTemplateType.Bugfix:
-					return r < 0.8;
+					return r < BUG_COMPLETE_RATIO;
 				case EntryTemplateType.ClientSupport:
-					return r < 0.95;
+					return r < SUPPORT_COMPLETE_RATIO;
 				case EntryTemplateType.Development:
-					return r < 0.5;
+					return r < DEV_COMPLETE_RATIO;
 				default:
 					return true;
 			}
-
 		}
 		#endregion
 	}
