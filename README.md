@@ -14,7 +14,9 @@
     string pathOrig = @"C:\Users\zzhang\Downloads\Misc\orig.txt";
     string pathNew = @"C:\Users\zzhang\Downloads\Misc\new.txt";
     string currentUser = "ZZ";
-    string[] appNames = new[] { "VeriFi", "MIAC Security Tool" };
+    string[] appNames = new[] { "VeriFi", "AiCR", "MIAC Security Tool" };
+    double[] appRatios = new[] { 0.55, 0.44, 0.01};
+    
 
 List your applications from most important to least important
 
