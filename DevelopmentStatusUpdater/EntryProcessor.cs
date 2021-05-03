@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Nager.Date;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Text;
 
 namespace DevelopmentStatusUpdater
@@ -8,7 +10,7 @@ namespace DevelopmentStatusUpdater
 	{
 		private readonly string username;
 
-		public EntryProcessor(string username)
+        public EntryProcessor(string username)
 		{
 			this.username = username;
 		}
@@ -23,7 +25,11 @@ namespace DevelopmentStatusUpdater
 
 		public bool IsHolidayEntry(IEntry entry)
 		{
-			return entry.Application.Equals("admin", StringComparison.InvariantCultureIgnoreCase);
+			bool adamHoliday = entry.Application.Equals("admin", StringComparison.InvariantCultureIgnoreCase);
+			if (adamHoliday) return true;
+
+			DateTime date = DateTime.Parse(entry.Date, new CultureInfo("en-US"));
+			return DateSystem.IsPublicHoliday(date, CountryCode.US) || DateSystem.IsWeekend(date, CountryCode.US);
 		}
 
 		public IEntryTemplate GenateHolidayEntry(IEntry entry)

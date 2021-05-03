@@ -8,7 +8,7 @@ namespace DevelopmentStatusUpdater
 	{
 		static void Main(string[] args)
 		{
-			string path = @"C:\Users\zsquared\Desktop\";
+			string path = @"C:\Users\zzhang\Downloads\";
 			string pathOrig = path + @"orig.txt";
 			string pathNew = path + @"new.txt";
 
